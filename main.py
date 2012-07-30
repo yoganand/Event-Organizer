@@ -13,6 +13,10 @@ class IndexHandler(tornado.web.RequestHandler):
     def get(self):
         self.write('Welcome to Event-Organizer')
 
+class MemberHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.wrtie('This is member handler')
+
 
 if __name__=='__main__':
     tornado.options.parse_command_line()
