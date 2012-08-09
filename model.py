@@ -1,8 +1,24 @@
 
-from sqlalchemy.ext.declarative import delcarative_base
-from sqlalchemy import Column, Integer, Float, String, Date, Datetime
 
-base = declarative_base()
+from sqlalchemy import create_engine
+from sqlalchemy import (Table, Column, Integer, Float, String, 
+            Date, DateTime, ForeignKey)
+from sqlalchemy.orm import relationship, backref
+from sqlalchemy.ext.declarative import declarative_base
+
+engine = create_engine('sqlite:///:memory:', echo=False)
+Base = declarative_base()
+
+member_committee_table = Table('member_committee', Base.metadata,
+	Column('member_id',Integer,ForeignKey('member.id')),
+	Column('committee_id',Integer,ForeignKey('committee.id'))
+)
+
+committee_service_table = Table('committee_service', Base.metadata,
+	Column('service_id',Integer,ForeignKey('service.id')),
+	Column('committee_id',Integer,ForeignKey('committee.id'))
+)
+
 
 class Member(Base):
     __tablename__ = 'member'
@@ -10,6 +26,9 @@ class Member(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     phone = Column(String)
+    committee = relationship("Committee",
+                      secondary=member_committee_table,
+                      backref="committees")
 
     def __init__(self, name, phone):
         self.name = name
@@ -17,7 +36,6 @@ class Member(Base):
 
     def __repr__(self):
         return self.name
-
 
 class Committee(Base):
     __tablename__ = 'committee'
@@ -35,11 +53,17 @@ class Committee(Base):
 class Service(Base):
     __tablename__ = 'service'
 
-    id = Column(Integer, primary_key)
+    id = Column(Integer, primary_key=True)
     name = Column(String)
+    committee = relationship("Committee",
+                    secondary=committee_service_table,
+                    backref="committees")
 
     def __init__(self,name):
         self.name = name
 
     def __repr__(self):
         return self.name
+
+def create_all():
+    Base.metadata.create_all(engine)
