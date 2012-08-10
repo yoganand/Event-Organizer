@@ -6,7 +6,8 @@ from sqlalchemy import (Table, Column, Integer, Float, String,
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 
-engine = create_engine('sqlite:///:memory:', echo=False)
+engine = create_engine('sqlite:////home/yoganand/work/Event-Organizer/test.db',
+                       echo=True)
 Base = declarative_base()
 
 member_committee_table = Table('member_committee', Base.metadata,
@@ -28,7 +29,7 @@ class Member(Base):
     phone = Column(String)
     committee = relationship("Committee",
                       secondary=member_committee_table,
-                      backref="committees")
+                      backref="members")
 
     def __init__(self, name, phone):
         self.name = name
@@ -49,7 +50,6 @@ class Committee(Base):
     def __repr__(self):
         return self.name
 
-
 class Service(Base):
     __tablename__ = 'service'
 
@@ -57,7 +57,7 @@ class Service(Base):
     name = Column(String)
     committee = relationship("Committee",
                     secondary=committee_service_table,
-                    backref="committees")
+                    backref="services")
 
     def __init__(self,name):
         self.name = name
@@ -67,3 +67,8 @@ class Service(Base):
 
 def create_all():
     Base.metadata.create_all(engine)
+
+if __name__=='__main__':
+    from sqlalchemy.orm import sessoinmaker
+    Session = sessionmaker(bind=engine)
+    session = Session()
