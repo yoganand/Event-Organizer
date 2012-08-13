@@ -1,7 +1,8 @@
-{% extends "base.html" %}
+exit{% extends "base.html" %}
 
 {% block content %}
   <form action="" method="post">
+  <input id="_method" name="_method" type="hidden" value="put">
     {% module Form(form) %}
     <input type="submit">
   </form>
