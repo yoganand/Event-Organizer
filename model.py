@@ -5,7 +5,7 @@ from sqlalchemy import (Table, Column, Integer, String, ForeignKey)
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
-engine = create_engine('sqlite:////home/yoganand/work/Event-Organizer/test.db',
+engine = create_engine('sqlite:////home/Event-Organizer/test.db',
                        echo=True)
 Base = declarative_base()
 
