@@ -1,0 +1,10 @@
+{% extends "../base.html" %}
+
+{% block content %}
+  <form action="{{service_id}}" method="post">
+  {% raw xsrf_form_html() %}
+  <input id="_method" name="_method" type="hidden" value="put">
+    {% module Form(form) %}
+    <input type="submit">
+  </form>
+{% end %}
