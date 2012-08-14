@@ -23,6 +23,10 @@ class Application(tornado.web.Application):
             (r"/", MainHandler),
             (r"/committee", CommitteeHandler),
             (r"/committee/(?P<id_>[^\/]+)", CommitteeHandler),
+            (r"/member", MemberHandler),
+            (r"/member/(?P<id_>[^\/]+)", MemberHandler),
+            (r"/service", ServiceHandler),
+            (r"/service/(?P<id_>[^\/]+)", ServiceHandler),
         ]
         settings = dict(
             cookie_secret="some_secret",
@@ -106,6 +110,116 @@ class CommitteeHandler(BaseHandler):
         committee = self.db.query(Committee).filter_by(id_=id_).first()
         if committee is not None:
             self.db.delete(committee)
+            self.db.commit()
+        else:
+            self.set_status(403)
+
+class MemberHandler(BaseHandler):
+    def get(self, id_=None):
+        if not id_:
+            member_form = MemberForm()
+            self.render('member/new.html', form=member_form)
+            return
+        member = self.db.query(Member).filter_by(id_=id_).first()
+        self.render('member/index.html',
+                    member=str(member.name),
+                    member_id=id_)
+
+    def post(self, id_=None):
+        if 'Edit' in self.request.arguments:
+            self._get(id_=id_)
+            return
+        elif 'Delete' in self.request.arguments:
+            self._delete(id_)
+            return
+        _method = self.get_argument('_method', None)
+        if _method == "put":
+            self._put(id_)
+            return
+        member_form = MemberForm(self)
+        if member_form.validate():
+            member = Member(**member_form.data)
+            self.db.add(member)
+            self.db.commit()
+            self.write('%s' % member_form.name.data)
+            return
+        else:
+            self.render('index.html', form=member_form)
+
+    def _get(self, id_=None):
+        member = self.db.query(Member).filter_by(id_=id_).first()
+        member_form = MemberForm(name=member.name, phone=member.phone)
+        self.render('member/edit.html', form=member_form,
+                   member_id=id_)
+
+    def _put(self, id_):
+        member = self.db.query(Member).filter_by(id_=id_).first()
+        if member is not None:
+            member.name = self.get_argument('name', None)
+            member.phone = self.get_argument('phone', None)
+            self.db.commit()
+            self.redirect(id_)
+            #self.write(committee.name)
+
+    def _delete(self, id_):
+        member = self.db.query(Member).filter_by(id_=id_).first()
+        if member is not None:
+            self.db.delete(member)
+            self.db.commit()
+        else:
+            self.set_status(403)
+
+
+class ServiceHandler(BaseHandler):
+    def get(self, id_=None):
+        if not id_:
+            service_form = ServiceForm()
+            self.render('service/new.html', form=service_form)
+            return
+        service = self.db.query(Service).filter_by(id_=id_).first()
+        self.render('service/index.html',
+                    service=str(service.name),
+                    service_id=id_)
+
+    def post(self, id_=None):
+        if 'Edit' in self.request.arguments:
+            self._get(id_=id_)
+            return
+        elif 'Delete' in self.request.arguments:
+            self._delete(id_)
+            return
+        _method = self.get_argument('_method', None)
+        if _method == "put":
+            self._put(id_)
+            return
+        service_form = ServiceForm(self)
+        if service_form.validate():
+            service = Service(**service_form.data)
+            self.db.add(service)
+            self.db.commit()
+            self.write('%s' % service_form.name.data)
+            return
+        else:
+            self.render('index.html', form=service_form)
+
+    def _get(self, id_=None):
+        service = self.db.query(Service).filter_by(id_=id_).first()
+        service_form = ServiceForm(name=service.name)
+        self.render('service/edit.html', form=service_form,
+                   service_id=id_)
+
+    def _put(self, id_):
+        service = self.db.query(Service).filter_by(id_=id_).first()
+        if service is not None:
+            service.name = self.get_argument('name', None)
+            self.db.commit()
+            self.redirect(id_)
+            #self.write(committee.name)
+
+    def _delete(self, id_):
+        service = self.db.query(Service).filter_by(id_=id_).first()
+        if service is not None:
+            self.db.delete(service)
             self.db.commit()
         else:
             self.set_status(403)
