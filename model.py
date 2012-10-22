@@ -4,8 +4,9 @@ from sqlalchemy import create_engine
 from sqlalchemy import (Table, Column, Integer, String, ForeignKey)
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
-engine = create_engine('sqlite:////home/Event-Organizer/test.db',
+engine = create_engine('sqlite:////home/yoganand/work/Event-Organizer/test.db',
                        echo=True)
 Base = declarative_base()
 
@@ -18,6 +19,10 @@ committee_service_table = Table('committee_service', Base.metadata,
         Column('service_id', Integer, ForeignKey('service.id_')),
         Column('committee_id', Integer, ForeignKey('committee.id_'))
 )
+
+
+class m:
+    Session = sessionmaker(bind=engine)()
 
 
 class Member(Base):
@@ -66,10 +71,13 @@ class Service(Base):
     def __repr__(self):
         return self.name
 
+
+def get_members():
+    return m.Session.query(Member)
+
 def create_all():
     Base.metadata.create_all(engine)
 
 if __name__=='__main__':
-    from sqlalchemy.orm import sessionmaker
     Session = sessionmaker(bind=engine)
     session = Session()

@@ -1,9 +1,9 @@
 
-
+from model import *
 from wtforms import *
 from wtforms.validators import *
-#from wtforms.ext.sqlalchemy.fields import (QuerySelectField,
-#                                           QuerySelectMultipleField)
+from wtforms.ext.sqlalchemy.fields import (QuerySelectField,
+                                           QuerySelectMultipleField)
 
 from utils import MultiValueDict
 
@@ -20,11 +20,13 @@ class BaseForm(Form):
 
 class CommitteeForm(BaseForm):
     name = TextField('name', validators=[Required()])
+    members = QuerySelectField(query_factory=get_members)
 
 
 class MemberForm(BaseForm):
     name = TextField('name', validators=[Required()])
     phone = TextField('phone')
+    #members = QuerySelectField()
 
 
 class ServiceForm(BaseForm):
